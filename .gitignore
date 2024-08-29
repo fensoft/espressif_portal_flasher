@@ -1,0 +1,6 @@
+.DS_Store
+firmwares.py
+Info.plist
+__pycache__
+Resources
+flasher.app
