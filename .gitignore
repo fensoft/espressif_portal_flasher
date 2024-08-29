@@ -4,3 +4,6 @@ Info.plist
 __pycache__
 Resources
 flasher.app
+flasher-*
+flasher.dist
+version.py

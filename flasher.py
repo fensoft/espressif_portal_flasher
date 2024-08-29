@@ -21,14 +21,13 @@ from PySide6.QtWidgets import (
 )
 
 from firmwares import firmwares
-
-# nuitka-project: --product-version=1.0.0
-VERSION = "1.0.0"
+from version import VERSION
 
 # --onefile
 # nuitka-project: --standalone
 # nuitka-project: --enable-plugin=pyside6
 # nuitka-project: --windows-icon-from-ico=icon.ico
+# nuitka-project: --windows-console-mode=disable
 # nuitka-project: --company-name=fensoft
 # nuitka-project: --product-name=PortalTurret
 # nuitka-project: --copyright=fensoft@gmail.com
@@ -81,6 +80,7 @@ class MainWindow(QMainWindow):
             app.processEvents()
 
         sys.stdout.write = MethodType(new_write, sys.stdout)
+        sys.stderr.write = MethodType(new_write, sys.stdout)
 
         widget = QWidget()
         widget.setLayout(mainlayout)
@@ -88,14 +88,15 @@ class MainWindow(QMainWindow):
     
     def flash(self):
         try:
-            with tempfile.NamedTemporaryFile(delete_on_close=False) as fp:
+            with tempfile.TemporaryDirectory() as tmpdirname:
+                fp = open(f"{tmpdirname}\\firmware.bin", "wb")
                 fp.write(firmwares[self.firmware.currentText()])
                 fp.close()
                 cmd = [
-                    '--port', self.port.currentData(),
+                    '--port', self.port.currentData().replace("\\\\.\\", ""),
                     '--baud','115200',
                     '--after', 'no_reset', 'write_flash',
-                    '--flash_mode', 'dout', '0x00000', fp.name,
+                    '--flash_mode', 'dout', '0x00000', f"{tmpdirname}\\firmware.bin",
                     '--erase-all'
                 ]
                 esptool.main(cmd)
