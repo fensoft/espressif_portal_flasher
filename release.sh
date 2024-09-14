@@ -36,4 +36,12 @@ if [ "$OS" = "Windows_NT" ]; then
   rm -rf flasher-$1
   cp -rf flasher.dist flasher-$1
   cp -rf temp/flasher.dist/* flasher-$1
+else
+  SP=`python -m site | grep site-packages | grep -v USER_SITE | sed "s#^[ ]*'##g" | sed "s#',\\$##"`
+  ls $SP/esptool/targets/stub_flasher
+  mkdir -p flasher.app/Contents/MacOS/esptool/targets/stub_flasher
+  cp $SP/esptool/targets/stub_flasher/* flasher.app/Contents/MacOS/esptool/targets/stub_flasher
+  cp icon.png flasher.app/Contents/MacOS/
+  rm -rf flasher-$1-$MACHTYPE.app
+  cp -rf flasher.app flasher-$1-$MACHTYPE.app
 fi
