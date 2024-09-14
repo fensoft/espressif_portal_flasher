@@ -7,3 +7,8 @@ flasher.app
 flasher-*
 flasher.dist
 version.py
+ffmpeg
+out
+fs.bin
+parameters.py
+nuitka-crash-report.xml

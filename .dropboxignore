@@ -1,0 +1,11 @@
+ffmpeg
+flasher-*
+flasher.build
+flasher.dist
+out
+portalturret
+__pycache__
+.git
+fs.bin
+.pio
+temp

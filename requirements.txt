@@ -2,3 +2,7 @@ PySide6==6.7.2
 nuitka==2.4.8
 esptool==4.7.0
 imageio==2.35.1
+vpk==1.4.0
+pydub==0.25.1
+littlefs-python==0.4.0
+PyYAML==6.0.1
