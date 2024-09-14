@@ -32,9 +32,9 @@ if [ "$OS" = "Windows_NT" ]; then
   SP=`python -m site | grep site-packages | grep -v USER_SITE | sed "s#^[ ]*'##g" | sed "s#',\\$##" | sed "s#\\\\\#/#g" | sed "s#//#/#g" | sed "s#:##"`
   mkdir -p flasher.dist/esptool/targets/stub_flasher
   cp /$SP/esptool/targets/stub_flasher/* flasher.dist/esptool/targets/stub_flasher
-  cp icon.png flasher.dist
   rm -rf flasher-$1
   cp -rf flasher.dist flasher-$1
+  cp icon.png flasher-$1
   cp -rf temp/flasher.dist/* flasher-$1
 else
   SP=`python -m site | grep site-packages | grep -v USER_SITE | sed "s#^[ ]*'##g" | sed "s#',\\$##"`
