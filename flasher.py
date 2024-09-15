@@ -103,31 +103,34 @@ class MainWindow(QMainWindow):
             str(parameters.littlefs["size"]),
             f"{self.temp}/fs.bin",
         )
-        if self.load_from.currentData() == "game":
-            if not os.path.exists(f"{self.temp}/ffmpeg.exe"):
-                print('downloading ffmpeg')
-                content = requests.get(self.ffmpeg.text())
-                zip = zipfile.ZipFile(io.BytesIO(content.content))
-                for i in zip.filelist:
-                    if 'ffmpeg.exe' in i.filename:
-                        print(f'using {i.filename}')
-                        open(f"{self.temp}/ffmpeg.exe", "wb").write(zip.read(i.filename))
-            print('converting audio files')
-            content = extract(
-                self.source.text(),
-                self.language.currentText(),
-                parameters.sounds,
-                self.temp
-            )
+        if 'esp8266' not in self.firmware.currentText():
+            if self.load_from.currentData() == "game":
+                if not os.path.exists(f"{self.temp}/ffmpeg.exe"):
+                    print('downloading ffmpeg')
+                    content = requests.get(self.ffmpeg.text())
+                    zip = zipfile.ZipFile(io.BytesIO(content.content))
+                    for i in zip.filelist:
+                        if 'ffmpeg.exe' in i.filename:
+                            print(f'using {i.filename}')
+                            open(f"{self.temp}/ffmpeg.exe", "wb").write(zip.read(i.filename))
+                print('converting audio files')
+                content = extract(
+                    self.source.text(),
+                    self.language.currentText(),
+                    parameters.sounds,
+                    self.temp
+                )
+            else:
+                print('downloading audio files')
+                prefix = self.source.text()
+                language = self.language.currentText()
+                content = {}
+                for key, val in parameters.sounds.items():
+                    for i in range(1, len(val) + 1):
+                        result = requests.get(f"{prefix}/{language}/{key}/{i:03}.mp3")
+                        content[f"{key}/{i:03}.mp3"] = result.content
         else:
-            print('downloading audio files')
-            prefix = self.source.text()
-            language = self.language.currentText()
             content = {}
-            for key, val in parameters.sounds.items():
-                for i in range(1, len(val) + 1):
-                    result = requests.get(f"{prefix}/{language}/{key}/{i:03}.mp3")
-                    content[f"{key}/{i:03}.mp3"] = result.content
         print('patching fs')
         patch_fs(f"{self.temp}/fs.bin", content, {"wifiSSID": self.ssid.text(), "wifiPassword": self.password.text()})
         print('uploading fs')
@@ -229,6 +232,7 @@ class MainWindow(QMainWindow):
     def save(self):
         self.settings.setValue("port", self.port.currentData())
         self.settings.setValue("language", self.language.currentData())
+        self.settings.setValue("firmware", self.firmware.currentText())
         self.settings.setValue("load_from", self.load_from.currentData())
         self.settings.setValue("source", self.source.text())
         self.settings.setValue("ssid", self.ssid.text())
@@ -245,6 +249,9 @@ class MainWindow(QMainWindow):
         self.port.setCurrentIndex(self.port.findData(self.settings.value("port", "")))
         self.language.setCurrentIndex(
             self.language.findData(self.settings.value("language", ""))
+        )
+        self.firmware.setCurrentIndex(
+            self.firmware.findText(self.settings.value("firmware", ""))
         )
         self.load_from.setCurrentIndex(self.load_from.findData(self.settings.value("load_from", "audio")))
         self.source.setText(self.settings.value("source", ""))
