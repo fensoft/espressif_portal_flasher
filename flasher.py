@@ -25,6 +25,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+from PySide6.QtNetwork import QUdpSocket, QHostAddress, QAbstractSocket
 
 import parameters
 from extract import extract
@@ -216,6 +217,19 @@ class MainWindow(QMainWindow):
         sys.stdout.write = MethodType(new_write, sys.stdout)
         sys.stderr.write = MethodType(new_write, sys.stdout)
         print(f'using temp dir {self.temp}')
+
+        try:
+            self.udp = QUdpSocket(self)
+            self.udp.bind(QHostAddress.Any, 1337)
+            self.udp.readyRead.connect(self.udp_receive)
+        except:
+            print("Can't bind to UDP 1337")
+
+    def udp_receive(self):
+        while self.udp.hasPendingDatagrams():
+            datagram = self.udp.receiveDatagram()
+            if datagram.data() == b'portalturret::discovery':
+                print(f"Device connected: {datagram.senderAddress().toString()}")
 
     def flash(self):
         try:

@@ -9,6 +9,6 @@ flasher.dist
 version.py
 ffmpeg
 out
-fs.bin
+*.bin
 parameters.py
 nuitka-crash-report.xml
