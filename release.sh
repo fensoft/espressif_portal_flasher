@@ -19,13 +19,12 @@ else
 fi
 cd ..
 pip install -r requirements.txt
-if [ ! -e ffmpeg ]; then
-  curl -L https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip -o ffmpeg.zip
-  unzip ffmpeg.zip
-  mv ffmpeg-* ffmpeg
-  rm ffmpeg.zip
+if [ "$OS" = "Windows_NT" ]; then
+  BOOT_APP0="$HOME/.platformio/packages/framework-arduinoespressif32@3.20006.221224/tools/partitions/boot_app0.bin"
+else
+  BOOT_APP0="$HOME/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin"
 fi
-python gen_parameters.py "$HOME/.platformio/packages/framework-arduinoespressif32@3.20006.221224/tools/partitions/boot_app0.bin"
+python gen_parameters.py ${BOOT_APP0}
 echo "VERSION = '$1'" > version.py
 python -m nuitka flasher.py --product-version=$1 --output-dir=temp
 if [ "$OS" = "Windows_NT" ]; then

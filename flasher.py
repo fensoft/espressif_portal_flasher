@@ -1,36 +1,35 @@
-import sys
-import yaml
-import tempfile
-import requests
-import os
-import zipfile
 import io
-
+import os
+import sys
+import tempfile
+import zipfile
 from types import MethodType
-from extract import extract
 
+import requests
+import yaml
 from PySide6.QtCore import QSettings, Qt
 from PySide6.QtGui import QIcon, QTextCursor
 from PySide6.QtSerialPort import QSerialPortInfo
 from PySide6.QtWidgets import (
     QApplication,
+    QCheckBox,
     QComboBox,
     QGridLayout,
+    QGroupBox,
     QLabel,
+    QLineEdit,
     QMainWindow,
     QMessageBox,
     QPushButton,
     QTextEdit,
     QVBoxLayout,
     QWidget,
-    QGroupBox,
-    QLineEdit,
-    QCheckBox,
 )
 
 import parameters
+from extract import extract
+from tools import download_fs, patch_fs, upload_firmware, upload_fs
 from version import VERSION
-from tools import download_fs, patch_fs, upload_fs, upload_firmware
 
 # --onefile
 # nuitka-project: --standalone
@@ -230,7 +229,7 @@ class MainWindow(QMainWindow):
     def save(self):
         self.settings.setValue("port", self.port.currentData())
         self.settings.setValue("language", self.language.currentData())
-        self.settings.setValue("load_from", self.load_from.currentIndex())
+        self.settings.setValue("load_from", self.load_from.currentData())
         self.settings.setValue("source", self.source.text())
         self.settings.setValue("ssid", self.ssid.text())
         self.settings.setValue("password", self.password.text())
@@ -247,7 +246,7 @@ class MainWindow(QMainWindow):
         self.language.setCurrentIndex(
             self.language.findData(self.settings.value("language", ""))
         )
-        self.load_from.setCurrentIndex(self.settings.value("load_from", ""))
+        self.load_from.setCurrentIndex(self.load_from.findData(self.settings.value("load_from", "audio")))
         self.source.setText(self.settings.value("source", ""))
         self.ssid.setText(self.settings.value("ssid", ""))
         self.password.setText(self.settings.value("password", ""))

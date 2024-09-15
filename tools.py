@@ -1,9 +1,11 @@
-import time
-import esptool
-from PySide6.QtSerialPort import QSerialPortInfo
-import parameters
-from littlefs import LittleFS
 import json
+import time
+
+import esptool
+from littlefs import LittleFS
+from PySide6.QtSerialPort import QSerialPortInfo
+
+import parameters
 
 
 def cmd(port, cmd):
@@ -11,7 +13,7 @@ def cmd(port, cmd):
         cmd = ["--port", port] + cmd
         before = [port.portName() for port in QSerialPortInfo.availablePorts()]
         try:
-            esptool.main(cmd)
+            esptool.main(["--after", "no_reset"] + cmd)
             return
         except:
             pass
