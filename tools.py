@@ -7,19 +7,24 @@ import json
 
 
 def cmd(port, cmd):
-    cmd = ["--port", port] + cmd
-    before = [port.portName() for port in QSerialPortInfo.availablePorts()]
+    if port != "auto":
+        cmd = ["--port", port] + cmd
+        before = [port.portName() for port in QSerialPortInfo.availablePorts()]
+        try:
+            esptool.main(cmd)
+            return
+        except:
+            pass
+        time.sleep(2)
+        after = [port.portName() for port in QSerialPortInfo.availablePorts()]
+        for i in before:
+            after.remove(i)
+        cmd[1] = after[0]
     try:
-        esptool.main(cmd)
-        return
+        esptool.main(["--after", "no_reset"] + cmd)
     except:
-        pass
-    time.sleep(2)
-    after = [port.portName() for port in QSerialPortInfo.availablePorts()]
-    for i in before:
-        after.remove(i)
-    cmd[1] = after[0]
-    esptool.main(cmd)
+        time.sleep(2)
+        esptool.main(["--after", "no_reset"] + cmd)
 
 
 def download_fs(port, offset, size, out):
@@ -71,7 +76,7 @@ def upload_firmware(port, files, tempdir, chip):
 
 
 def patch_fs(file, content, forced_settings):
-    fs = LittleFS(block_size=4096, block_count=parameters.littlefs["size"] / 4096)
+    fs = LittleFS(block_size=4096, block_count=int(parameters.littlefs["size"] / 4096), disk_version=0x00020000)
     data = open(file, "rb").read()
     fs.context.buffer = bytearray(data)
     settings = {}

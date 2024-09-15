@@ -237,6 +237,7 @@ class MainWindow(QMainWindow):
 
     def refresh(self):
         self.port.clear()
+        self.port.addItem("Auto", "auto")
         for port in QSerialPortInfo.availablePorts():
             text = port.portName()
             text += " / " + port.description() if port.description() != "" else ""
