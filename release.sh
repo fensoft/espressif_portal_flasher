@@ -17,6 +17,11 @@ if [ "$OS" = "Windows_NT" ]; then
 else
   pio run
 fi
+mkdir -p portalturret_$1
+for i in .pio/build/*/firmware.bin; do
+  cp $i portalturret_$1/portalturret_$1_`basename $(dirname $i)`.bin
+done
+zip -r9 portalturret_$1_firmwares.zip portalturret_$1
 cd ..
 pip install -r requirements.txt
 if [ "$OS" = "Windows_NT" ]; then
@@ -37,10 +42,9 @@ if [ "$OS" = "Windows_NT" ]; then
   cp -rf temp/flasher.dist/* flasher-$1
 else
   SP=`python -m site | grep site-packages | grep -v USER_SITE | sed "s#^[ ]*'##g" | sed "s#',\\$##"`
-  ls $SP/esptool/targets/stub_flasher
-  mkdir -p flasher.app/Contents/MacOS/esptool/targets/stub_flasher
-  cp $SP/esptool/targets/stub_flasher/* flasher.app/Contents/MacOS/esptool/targets/stub_flasher
-  cp icon.png flasher.app/Contents/MacOS/
+  mkdir -p temp/flasher.app/Contents/MacOS/esptool/targets/stub_flasher
+  cp $SP/esptool/targets/stub_flasher/* temp/flasher.app/Contents/MacOS/esptool/targets/stub_flasher
+  cp icon.png temp/flasher.app/Contents/MacOS/
   rm -rf flasher-$1-$MACHTYPE.app
-  cp -rf flasher.app flasher-$1-$MACHTYPE.app
+  cp -rf temp/flasher.app flasher-$1-$MACHTYPE.app
 fi
